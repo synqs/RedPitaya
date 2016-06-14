@@ -1,0 +1,6 @@
+{
+    "name": "RedPitaya Web-Shell",
+    "version": "0.94-BUILD_NUMBER",
+    "revision": "REVISION",
+    "description": "A simple shell which enables executing commands on RedPitaya from Browser."
+}

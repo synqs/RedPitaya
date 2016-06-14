@@ -1,0 +1,27 @@
+Entsprechend der Version müssen die Dateien aus dem assets-Ordner in dem gleichnamigen Ordner auf dem RedPitaya (/opt/redpitaya/www/apps/) kopiert werden. 
+Ebenso muss auch die index.html Datei auf dem RedPitaya (/opt/redpitaya/www/apps/) durch die hiesige ersetzt werden. 
+
+//
+Funktion:
+Im Wesentlichen muss -nachdem alles andere geladen ist- folgender JavaScript-Code ausgeführt werden:
+
+					$.ajax({
+						url: '/data',
+            			cache: false,
+						timeout: 3000,
+						async: true
+        			})
+							//will success if an app is running. If request fails -> no app is running
+					.done(function(dresult){
+						if(dresult.status === 'OK' && dresult.app !== undefined && dresult.datasets !== undefined && dresult.datasets.params !== undefined) {
+							toastr.options = {"closeButton": false, "debug": false, "newestOnTop": false, "progressBar": false, "positionClass": "toast-top-center", "preventDuplicates": false, "onclick": 								null, "showDuration": "300", "hideDuration": "1000", "timeOut": "15000", "extendedTimeOut": "1000", "showEasing": "swing", "hideEasing": "linear", "showMethod": "fadeIn", 									"hideMethod": "fadeOut"
+							}
+							toastr["error"]("Starting a different app will kill the running one!", dresult.app.id+"-app already running!");				
+						}
+					});
+
+Je nach Version müssen evtl noch UI Elemente (zb Ladesymbole) abgeschaltet werden..
+
+In der index.html Datei müssen nun nur noch die Dateien toastr.min.js und toastr.min.css verlinkt werden.
+
+Dieser Code funktioniert nicht für Pro-Apps, da diese scheinbar etwas anders mit dem RedPitaya kommunizieren (d.h. der Code kann nicht feststellen ob eine Pro-App läuft) !!!!! 

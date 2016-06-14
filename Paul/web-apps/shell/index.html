@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RedPitaya Web-Shell</title>
+  <link href="../assets/bootstrap-3.0.0/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../assets/style.css?6" rel="stylesheet" type="text/css">
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <script src="../assets/bootstrap-3.0.0/js/jquery.js"></script>
+  <script src="../assets/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+  <script src="../assets/flot/jquery.flot.min.js"></script>
+  <script src="../assets/flot/jquery.flot.selection.min.js"></script>
+  <script src="../assets/flot/jquery.flot.navigate.js"></script>
+  <script src="../assets/flot/jquery.flot.resize.min.js"></script>
+  <script src="../assets/flot/jquery.flot.touch.js?2"></script>
+  <script src="main.js"></script>
+  <script src="../assets/redpitaya.custom.js"></script>
+</head>
+<body>
+	<div id="shell">
+	</div>
+	<div class="inputWrapper">
+		<div class="prompt"><span class="prompt1">red</span><span class="prompt2">pitaya></span></div>
+		<div class="input_field"><textarea id="shell_input" rows="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></div>
+	</div>
+	<div id="modal_err" class="modal" tabindex="-1" role="dialog" aria-labelledby="modal_err_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_err_label">Application error</h4>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-close-modal" id="btn_ignore">Ignore</button>
+          <button type="button" class="btn btn-default" id="btn_retry_get">Retry</button>
+          <button type="button" class="btn btn-primary btn-app-restart">Restart</button>
+        </div>
+      </div>
+    </div>
+  	</div>
+</body>
+</html>
+  

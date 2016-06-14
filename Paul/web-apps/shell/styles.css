@@ -1,0 +1,61 @@
+html,body{
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+body{
+	background-color: #1D1F20;
+}
+.prompt1{
+	font-family: "New", monospace;
+	font-size: 28px;
+	color: #9A0722
+}
+.prompt2{
+	font-family: "New", monospace;
+	font-size: 28px;
+	color: #A82729
+}
+.prompt_placeholder{
+	font-family: "New", monospace;
+	font-size: 28px;
+	color: #1D1F20;
+}
+#shell{
+	min-height: 16px;
+	padding-left: 10px;
+	padding-right: 10px;
+	max-height: 50%;
+	background-color: #1D1F20;
+	overflow: auto;
+}
+#shell > p{
+	margin-top:16px;
+	margin-bottom:16px;
+}
+.cmd{
+	font-family: "New", monospace;
+	font-size: 28px;
+	color: #DDCA7E;
+}
+textarea{
+	background-color: #1D1F20;
+	font-family: "New", monospace;
+	font-size: 28px;
+	border-style: none;
+	color: #DDCA7E;
+	width: calc( 100% - 185px);
+}
+.inputWrapper{
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #1D1F20;
+}
+.prompt{
+	float: left;
+}
+.input_field{
+	width: 100%;
+	margin-left: 185px;
+}

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laser Stabilizer</title>
+  <link href="../assets/bootstrap-3.0.0/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../assets/style.css?6" rel="stylesheet" type="text/css">
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <script src="../assets/bootstrap-3.0.0/js/jquery.js"></script>
+  <script src="../assets/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+  <script src="../assets/flot/jquery.flot.min.js"></script>
+  <script src="../assets/flot/jquery.flot.selection.min.js"></script>
+  <script src="../assets/flot/jquery.flot.navigate.js"></script>
+  <script src="../assets/flot/jquery.flot.resize.min.js"></script>
+  <script src="../assets/flot/jquery.flot.touch.js?2"></script>
+  <script src="../assets/redpitaya.custom.js"></script>
+  <script src="main.js"></script>
+  <script src="FileSaver.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="container">
+      <a id="btn_exit" class="pull-left" href="/index.html"><span class="glyphicon glyphicon-chevron-left" title="Exit" alt="Exit"></span></a>
+      <img class="logo pull-left" src="../assets/images/logo_white.png">
+      <h2 class="page-title">Laser Stabilizer</h2>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div id="btn_toolbar" class="col-xs-12">
+        <button id="btn_autoscale_y" class="btn btn-primary btn-lg" data-autozoom="false" onclick="autoscaleY()">
+          <span class="glyphicon glyphicon-resize-vertical"></span> Autoscale
+        </button>
+        <button class="btn btn-primary btn-lg" onclick="resetZoom()">
+          <span class="glyphicon glyphicon-retweet"></span> Reset zoom
+        </button>  
+        <div id="selzoompan" class="btn-group" data-toggle="buttons">
+          <button id="btn_zoomin" class="btn btn-primary" onclick="selectTool.call(this, 'zoomin')" style="display: none">
+            <span class="glyphicon glyphicon-zoom-in"></span>
+          </button>
+          <button id="btn_zoomout" class="btn btn-default" onclick="selectTool.call(this, 'zoomout')" style="display: none">
+            <span class="glyphicon glyphicon-zoom-out"></span>
+          </button>
+          <button id="btn_pan" class="btn btn-default" onclick="selectTool.call(this, 'pan')" style="display: none">
+            <span class="glyphicon glyphicon-move"></span>
+          </button>
+          <button id="btn_zoompan" class="btn btn-primary btn-lg" onclick="selectTool.call(this, 'zoompan')" style="display: none">
+            <span class="glyphicon glyphicon-search"></span><span class="glyphicon glyphicon-move"></span>
+          </button>
+        </div>
+        <button id="btn_ch1" class="btn btn-primary btn-lg" data-checked="true" onclick="setVisibleChannels(this)">Channel 1</button>
+        <button id="btn_ch2" class="btn btn-primary btn-lg" data-checked="true" onclick="setVisibleChannels(this)">Channel 2</button>
+        <!--<button id="btn_auto" class="btn btn-primary btn-lg" onclick="serverAutoScale()">AUTO</button>
+        <button id="btn_avg" class="btn btn-default btn-lg" onclick="setAvgAtDec()">Averaging</button>-->
+        <div class="onoffswitch">
+        	<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="op_mode" checked>
+        	<label class="onoffswitch-label" for="op_mode">
+            	<span class="onoffswitch-inner"></span>
+            	<span class="onoffswitch-switch"></span>
+        	</label>
+   	 	</div>
+        <button id="btn_lawake" class="btn btn-primary btn-lg" data-checked="true" onclick="leaveAwake(this)">leave awake</button>   
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-8">
+        <div class="graph-holder well well-small">
+          <div id="ytitle">Voltage [ V ]</div>
+          <div id="plot_holder"></div>
+          <div id="xtitle"></div>
+          <div id="trigger_cnv_holder" style="width:650px; height:25px; float:none; position:relative; margin: 5px 30px 0px 10px;">
+            <canvas id="loff_canvas" width="650" height="25"></canvas>
+            <div id="loff_tooltip" ></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-group col-xs-12 col-sm-12 col-md-4" id="accordion">
+      	<div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" href="#general">
+                General
+              </a>
+            </h4>
+          </div>
+          <div id="general" class="panel-collapse collapse">
+            <div class="panel-body">
+              <form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label class="col-xs-4 col-sm-3 control-label" style="padding-top: 35px;">Range:</label>
+                  <div class="col-xs-8 col-sm-9">
+                    <div class="row">
+                      <div class="col-xs-6 text-center">
+                        <div class="group-label" style="padding-bottom: 10px;">X axis</div>
+                        <div class="btn-group" style="margin-bottom: -3px;">
+                          <button id="range_x_minus" type="button" class="btn btn-primary btn-lg range-btn-left">
+                            <span class="glyphicon glyphicon-minus"></span>
+                          </button>
+                          <button id="range_x_plus" type="button" class="btn btn-primary btn-lg range-btn-right">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </button>
+                        </div>
+                        <div>
+                          <span id="range_x" class="badge range-badge">-</span>
+                        </div>
+                      </div>
+                      <div class="col-xs-6 text-center">
+                        <div class="group-label" style="padding-bottom: 10px;">Y axis</div>
+                        <div class="btn-group" style="margin-bottom: -3px;">
+                          <button id="range_y_minus" type="button" class="btn btn-primary btn-lg range-btn-left">
+                            <span class="glyphicon glyphicon-minus"></span>
+                          </button>
+                          <button id="range_y_plus" type="button" class="btn btn-primary btn-lg range-btn-right">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </button>
+                        </div>
+                        <div>
+                          <span id="range_y" class="badge range-badge">-</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-xs-4 col-sm-3 control-label">Offset:</label>
+                  <div class="col-xs-8 col-sm-9">
+                    <div class="row">
+                      <div class="col-xs-6 text-center">
+                        <div class="btn-group" style="margin-bottom: -3px;">
+                          <button id="offset_x_minus" type="button" class="btn btn-primary btn-lg range-btn-left">
+                            <span class="glyphicon glyphicon-minus"></span>
+                          </button>
+                          <button id="offset_x_plus" type="button" class="btn btn-primary btn-lg range-btn-right">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="col-xs-6 text-center">
+                        <div class="btn-group" style="margin-bottom: -3px;">
+                          <button id="offset_y_minus" type="button" class="btn btn-primary btn-lg range-btn-left">
+                            <span class="glyphicon glyphicon-minus"></span>
+                          </button>
+                          <button id="offset_y_plus" type="button" class="btn btn-primary btn-lg range-btn-right">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>             
+              <form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label for="target_channel" class="col-xs-4 control-label">Target channel:</label>
+                  <div class="col-xs-8">
+                    <select id="target_channel" class="form-control">
+                      <option value="0">Channel 1</option>
+                      <option value="1">Channel 2</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" href="#scan">
+                Scan
+              </a>
+            </h4>
+          </div>
+          <div id="scan" class="panel-collapse collapse">
+            <div class="panel-body">
+              <form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label for="gen_ampl" class="col-xs-4 control-label">Amplitude:</label>
+                  <div class="col-xs-4 col-sm-5">
+                    <input type="text" autocomplete="off" class="form-control" value="0" id="gen_ampl">
+                    <span style="display: none;" class="input-group-btn" id="apply_gen_ampl">
+                      <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                    </span>
+                  </div>
+                  <div style="padding: 7px 0 0;" class="col-xs-2" id="gen_ampl_units">Vpp</div>
+                </div>
+              </form>
+              <!--<form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label for="gen_freq" class="col-xs-4 control-label">Frequency:</label>
+                  <div class="col-xs-4 col-sm-5">
+                    <input type="text" autocomplete="off" class="form-control" value="0" id="gen_freq">
+                    <span style="display: none;" class="input-group-btn" id="apply_gen_freq">
+                      <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                    </span>
+                  </div>
+                  <div style="padding: 7px 0 0;" class="col-xs-2" id="gen_freq_units">Hz</div>
+                </div>
+              </form>-->
+              <form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label for="gen_freq" class="col-xs-4 control-label">DC offset:</label>
+                  <div class="col-xs-4 col-sm-5">
+                    <input type="text" autocomplete="off" class="form-control" value="0" id="gen_dc_off">
+                    <span style="display: none;" class="input-group-btn" id="apply_gen_dc_off">
+                      <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                    </span>
+                  </div>
+                  <div style="padding: 7px 0 0;" class="col-xs-2" id="gen_ampl_units">V</div>
+                </div>
+              </form>
+              <form class="form-horizontal" role="form" onsubmit="return false;">
+                <div class="form-group">
+                  <label for="gen_freq" class="col-xs-4 control-label">Lock offset:</label>
+                  <div class="col-xs-4 col-sm-5">
+                    <input type="text" autocomplete="off" class="form-control" value="0" id="lock_off">
+                    <span style="display: none;" class="input-group-btn" id="apply_lock_off">
+                      <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                    </span>
+                  </div>
+                  <div style="padding: 7px 0 0;" class="col-xs-2" id="gen_ampl_units">V</div>
+                </div>
+              </form>
+            </div>
+          </div>  
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" href="#lock">
+                Lock
+              </a>
+            </h4>
+          </div>
+          <div id="lock" class="panel-collapse collapse">
+          <div class="panel-body">
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_11_enable" checked> PID 1 -> 1
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_11_rst" checked> Integrator reset
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_11_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_sp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_11_sp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_11_sp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_11_kp" class="col-xs-4 control-label">Kp:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_kp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_11_kp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_11_kp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_11_ki" class="col-xs-4 control-label">Ki:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_ki">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_11_ki">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_11_ki_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_11_kd" class="col-xs-4 control-label">Kd:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_kd">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_11_kd">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_11_kd_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_12_enable" checked> PID 2 -> 1
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_12_rst" checked> Integrator reset
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_12_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_sp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_12_sp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_12_sp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_12_kp" class="col-xs-4 control-label">Kp:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_kp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_12_kp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_12_kp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_12_ki" class="col-xs-4 control-label">Ki:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_ki">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_12_ki">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_12_ki_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_12_kd" class="col-xs-4 control-label">Kd:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_kd">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_12_kd">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_12_kd_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_21_enable" checked> PID 1 -> 2
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_21_rst" checked> Integrator reset
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_21_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_sp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_21_sp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_21_sp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_21_kp" class="col-xs-4 control-label">Kp:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_kp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_21_kp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_21_kp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_21_ki" class="col-xs-4 control-label">Ki:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_ki">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_21_ki">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_21_ki_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_21_kd" class="col-xs-4 control-label">Kd:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_kd">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_21_kd">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_21_kd_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_22_enable" checked> PID 2 -> 2
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_22_rst" checked> Integrator reset
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_22_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_sp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_22_sp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_sp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_22_kp" class="col-xs-4 control-label">Kp:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_kp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_22_kp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_kp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_22_ki" class="col-xs-4 control-label">Ki:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_ki">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_22_ki">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_ki_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_22_kd" class="col-xs-4 control-label">Kd:</label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_kd">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_22_kd">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_kd_units">cnt</div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+	        <div class="panel-heading">
+	          <h4 class="panel-title">
+	            <a data-toggle="collapse" href="#settings">
+	              Settings Menu
+	            </a>
+	          </h4>
+	        </div>
+	        <div id="settings" class="panel-collapse collapse">
+	          <div class="panel-body">
+	            <form class="form-horizontal" role="form" onsubmit="return false;">
+	              <div class="row" style="margin-bottom:10px;">
+			    	<div class="col-xs-8 col-md-12 col-lg-8 col-sm-offset-4 col-md-offset-0 col-lg-offset-4 settings_btns">
+	                 <button id="settings_import" class="btn btn-primary btn_settings" onclick="return showSettingsImportForm()">
+	                    <span class="glyphicon glyphicon-upload"></span> Import
+	                  </button>
+	                  <button id="settings_export" class="btn btn-primary btn_settings" onclick="return exportSettings()">
+	                    <span class="glyphicon glyphicon-upload"></span> Export
+	                  </button> 
+	                </div>
+	              </div>
+	              <div class="row">
+			    	<div class="col-xs-8 col-md-12 col-lg-8 col-sm-offset-4 col-md-offset-0 col-lg-offset-4 settings_btns">
+	                  <button id="settings_upload" class="btn btn-primary btn_settings" onclick="return loadSettings()">
+	                    <span class="glyphicon glyphicon-upload"></span> Load
+	                  </button>
+	                  <button id="settings_save" class="btn btn-primary btn_settings" onclick="return saveSettings()">
+	                    <span class="glyphicon glyphicon-upload"></span> Save
+	                  </button> 
+	                </div>
+	              </div>
+	            </form>
+	          </div>
+	        </div>
+      	</div>
+      </div>
+    </div>
+    <div class="footer clearfix">
+      <p class="pull-right" style="margin: 4px 0 0">&copy; 2014 - Red Pitaya</p>
+    </div>
+  </div>
+  <div id="modal_err" class="modal" tabindex="-1" role="dialog" aria-labelledby="modal_err_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_err_label">Application error</h4>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-close-modal" id="btn_ignore">Ignore</button>
+          <button type="button" class="btn btn-default" id="btn_retry_get">Retry</button>
+          <button type="button" class="btn btn-primary btn-app-restart">Restart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal_app" class="modal" tabindex="-1" role="dialog" aria-labelledby="modal_app_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_app_label">Application stopped</h4>
+        </div>
+        <div class="modal-body">
+          The <strong><span class="app-id"></span></strong> application was stopped. The current started application is <strong><span id="new_app_id"></span></strong>.<br />
+          Do you want to switch to newly started application or to restart <strong><span class="app-id"></span></strong>?
+        </div>
+        <div class="modal-footer">
+          <a href="/index.html" class="btn btn-danger pull-left">Exit app</a>
+          <button type="button" class="btn btn-default" id="btn_switch_app">Switch</button>
+          <button type="button" class="btn btn-primary btn-app-restart">Restart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal_upload" class="modal" tabindex="-1" role="dialog" aria-labelledby="modal_upload_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_upload_label">File upload for channel <span></span></h4>
+        </div>
+        <div class="modal-body"> 
+          <form id="upload_form" role="form">
+            <div class="form-group">
+              <input type="file" name="file_select" id="uploaded_file">
+              <input type="hidden" name="file_content" id="uploaded_file_content">
+              <p class="help-block">Select the CSV file to upload.</p>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer" style="margin-top: 0;">
+          <button type="button" class="btn btn-default btn-close-modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="startUpload()">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>  
+</body>
+</html>

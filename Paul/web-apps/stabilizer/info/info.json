@@ -1,0 +1,6 @@
+{
+    "name": "Laser Stabilizer",
+    "version": "0.94-BUILD_NUMBER",
+    "revision": "REVISION",
+    "description": "Scan & PID Controller for laser stabilization."
+}

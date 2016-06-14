@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+ <title>TestApp</title>
+  <script src="../assets/bootstrap-3.0.0/js/jquery.js"></script>
+  <script src="../assets/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+  <script src="../assets/flot/jquery.flot.min.js"></script>
+  <script src="../assets/flot/jquery.flot.selection.min.js"></script>
+  <script src="../assets/flot/jquery.flot.navigate.js"></script>
+  <script src="../assets/flot/jquery.flot.resize.min.js"></script>
+  <script src="../assets/flot/jquery.flot.touch.js?2"></script>
+ <script src="../assets/redpitaya.custom.js"></script>
+<script type="text/javascript">
+  var app_id = 'test';  
+	var root_url = '';
+	var stop_app_url = root_url + '/bazaar?stop=';
+	var start_app_url = root_url + '/bazaar?start=' + app_id;
+	var get_url = root_url + '/data';
+	var post_url = root_url + '/data'; 
+	var params_l = {
+    digital_led_bar: 0
+	}; 
+	var request_timeout = 3000;            // Milliseconds
+
+	//wait until when page is loaded
+	$(function (){
+		//post params
+		$("#led").on("click", function(){
+			params_l.digital_led_bar=1;			
+			$.ajax({
+      	type: 'POST',
+      	url: post_url,
+      	data: JSON.stringify({ datasets: { params: params_l }}),
+      	timeout: request_timeout,
+      	cache: false
+    	});
+  	});
+
+		//stop app
+		window.onbeforeunload = function() { 
+      $.ajax({
+        url: stop_app_url,
+        async: false
+      });
+    };
+		startApp();
+	});
+
+	function startApp() {
+    $.get(
+      start_app_url
+    )
+    .done(function(dresult) {
+
+    	if(dresult.status == 'ERROR') {
+      	alert("error");
+      }
+    })
+    .fail(function() {
+      alert("error3");
+  	});
+	}
+</script>
+</head>
+<body>
+  <h1>Hello World!</h1>
+	<button id="led">enable leds (api example digital_led_bar has to be installed to /opt/redpitaya/bin/)</button>
+</body>
+</html>

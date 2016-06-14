@@ -1,0 +1,89 @@
+redpitaya> LD_LIBRARY_PATH=/opt/redpitaya/lib ./acq_api_test
+Be sure that OUT2 is connected to IN2.
+trigger source:
+	0: RP_TRIG_SRC_DISABLED
+	4: RP_TRIG_SRC_CHB_PE
+trigger state:
+	0: RP_TRIG_STATE_TRIGGERED
+	1: RP_TRIG_STATE_WAITING
+lets look how the write pointer moves after rp_AcqReset()
+	pos: 0; pos when triggered: 0; trigger source: 0; trigger state: 1
+	pos: 0; pos when triggered: 0; trigger source: 0; trigger state: 1
+start acquiring samples
+lets look how the write pointer moves
+	write pointer: 236; write pointer at trigger: 0; trigger source: 0; trigger state: 1
+	write pointer: 531; write pointer at trigger: 0; trigger source: 0; trigger state: 1
+	write pointer: 800; write pointer at trigger: 0; trigger source: 0; trigger state: 1
+arm scope
+wait for trigger (0V posedge on Channel2)
+	write pointer: 1047; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 1308; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 1553; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 1810; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 2074; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 2322; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 2604; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 2870; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 3134; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 3390; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 3652; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 3910; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 4168; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 4428; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 4686; write pointer at trigger: 0; trigger source: 4; trigger state: 1
+	write pointer: 4942; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 5199; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 5456; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 5718; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 5976; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 6233; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 6489; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 6746; write pointer at trigger: 4779; trigger source: 4; trigger state: 0
+	write pointer: 6779; write pointer at trigger: 4779; trigger source: 0; trigger state: 1
+scope is done with acquiring (2000) samples. Does the write pointer move?
+	write pointer: 6779; write pointer at trigger: 4779; trigger source: 0; trigger state: 1
+	write pointer: 6779; write pointer at trigger: 4779; trigger source: 0; trigger state: 1
+
+read out interesting part of buffer
+i		data		latest		oldest
+4774		-0.001733		-		-
+4775		-0.001444		-		-
+4776		-0.001300		-		-
+4777		-0.000722		-		-
+4778		-0.000433		-		-
+~~~~~~~~
+write pointer at trigger
+4779		0.000289		0.000289		-
+~~~~~~~~
+4780		0.000722		0.000722		-
+4781		0.001300		0.001300		-
+4782		0.001733		0.001733		-
+4783		0.002166		0.002166		-
+4784		0.002744		0.002744		-
+...
+6774		0.957362		0.957362		-
+6775		0.957939		0.957939		-
+6776		0.958517		0.958517		-
+6777		0.958806		0.958806		-
+6778		0.959384		0.959384		-
+~~~~~~~~
+write pointer
+6779		0.959673		-		-
+~~~~~~~~
+6780		0.938587		-		0.938587
+6781		0.939020		-		0.939020
+6782		0.939598		-		0.939598
+6783		0.939887		-		0.939887
+6784		0.940320		-		0.940320
+...
+8775		0.374915		-		0.374915
+8776		0.374482		-		0.374482
+8777		0.374048		-		0.374048
+8778		0.373471		-		0.373471
+8779		0.372893		-		0.372893
+8780		0.372460		-		-
+8781		0.372027		-		-
+8782		0.371593		-		-
+8783		0.371016		-		-
+8784		0.370727		-		-
+
