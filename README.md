@@ -1,5 +1,5 @@
 #About
-This branch is a fork of the official RedPitaya repository. It also contains the work I've done so far for AG Ultracold at Uni Heidelberg in the following places:
+This branch is forked from the official RedPitaya repository. It also contains the work I've done so far for AG Ultracold at Uni Heidelberg in the following places:
 
 | directories  | contents
 |--------------|----------------------------------------------------------------
