@@ -18,7 +18,7 @@
 int pid_init(void);
 int pid_exit(void);
 
-int pid_update(rp_app_params_t *params, int target_channel);
+int pid_update(rp_app_params_t *params);
 
 int pid_disable();
 

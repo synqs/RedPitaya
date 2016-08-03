@@ -54,13 +54,19 @@
         <!--<button id="btn_auto" class="btn btn-primary btn-lg" onclick="serverAutoScale()">AUTO</button>
         <button id="btn_avg" class="btn btn-default btn-lg" onclick="setAvgAtDec()">Averaging</button>-->
         <div class="onoffswitch">
+            <a data-toggle="tooltip" title="Scan mode: Scan signal (triangle) will be generated on target channel &#10;Lock mode: PIDs can now be used to control the input signals" style="text-decoration:none; color: #333333">
         	<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="op_mode" checked>
         	<label class="onoffswitch-label" for="op_mode">
             	<span class="onoffswitch-inner"></span>
             	<span class="onoffswitch-switch"></span>
         	</label>
+        	</a>
    	 	</div>
-        <button id="btn_lawake" class="btn btn-primary btn-lg" data-checked="true" onclick="leaveAwake(this)">leave awake</button>   
+   	 	<div class="btn_lawake">
+        	<a data-toggle="tooltip" title="Leave without killing the application (in lock-mode only)." style="text-decoration:none; color: #333333">
+        		<button id="btn_lawake" class="btn btn-primary btn-lg" data-checked="true" onclick="leaveAwake(this)">leave awake</button>
+        	</a> 
+        </div>  
       </div>
     </div>
     <div class="row">
@@ -74,6 +80,7 @@
             <div id="loff_tooltip" ></div>
           </div>
         </div>
+        <textarea id="comment" rows="4" cols="50" maxlength="100">Make a note</textarea>
       </div>
       <div class="panel-group col-xs-12 col-sm-12 col-md-4" id="accordion">
       	<div class="panel panel-default">
@@ -152,7 +159,7 @@
               </form>             
               <form class="form-horizontal" role="form" onsubmit="return false;">
                 <div class="form-group">
-                  <label for="target_channel" class="col-xs-4 control-label">Target channel:</label>
+                  <label for="target_channel" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Channel on which the scan signal and lock offset will be generated" style="text-decoration:none; color: #333333">Target channel:</a></label>
                   <div class="col-xs-8">
                     <select id="target_channel" class="form-control">
                       <option value="0">Channel 1</option>
@@ -176,7 +183,7 @@
             <div class="panel-body">
               <form class="form-horizontal" role="form" onsubmit="return false;">
                 <div class="form-group">
-                  <label for="gen_ampl" class="col-xs-4 control-label">Amplitude:</label>
+                  <label for="gen_ampl" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Amplitude of the scan signal (triangle form)" style="text-decoration:none; color: #333333">Amplitude:</a></label>
                   <div class="col-xs-4 col-sm-5">
                     <input type="text" autocomplete="off" class="form-control" value="0" id="gen_ampl">
                     <span style="display: none;" class="input-group-btn" id="apply_gen_ampl">
@@ -200,7 +207,7 @@
               </form>-->
               <form class="form-horizontal" role="form" onsubmit="return false;">
                 <div class="form-group">
-                  <label for="gen_freq" class="col-xs-4 control-label">DC offset:</label>
+                  <label for="gen_freq" class="col-xs-4 control-label"><a data-toggle="tooltip" title="DC offset for the scan signal. Offset and scan signal will be added and have to be in sum less than 1V" style="text-decoration:none; color: #333333">DC offset:</a></label>
                   <div class="col-xs-4 col-sm-5">
                     <input type="text" autocomplete="off" class="form-control" value="0" id="gen_dc_off">
                     <span style="display: none;" class="input-group-btn" id="apply_gen_dc_off">
@@ -212,7 +219,7 @@
               </form>
               <form class="form-horizontal" role="form" onsubmit="return false;">
                 <div class="form-group">
-                  <label for="gen_freq" class="col-xs-4 control-label">Lock offset:</label>
+                  <label for="gen_freq" class="col-xs-4 control-label"><a data-toggle="tooltip" title="DC offset that will be generated on target channel in 'lock-mode'. In other words: A constant voltage that will be added to PID output on target channel." style="text-decoration:none; color: #333333">Lock offset:</a></label>
                   <div class="col-xs-4 col-sm-5">
                     <input type="text" autocomplete="off" class="form-control" value="0" id="lock_off">
                     <span style="display: none;" class="input-group-btn" id="apply_lock_off">
@@ -238,7 +245,7 @@
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="checkbox" style="padding-bottom: 12px;">
                 <label class="group-label">
-                  <input type="checkbox" id="pid_11_enable" checked> PID 1 -> 1
+                  <input type="checkbox" id="pid_11_enable" checked><a data-toggle="tooltip" title="This PID uses CH1/CHA as input and is wired to ouput CH1/CHA" style="text-decoration:none; color: #333333"> PID 1 -> 1</a>
                 </label>
               </div>
             </form>
@@ -251,7 +258,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_11_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <label for="pid_11_sp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Input (error) value the pid tries to hold" style="text-decoration:none; color: #333333">Setpoint:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_sp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_11_sp">
@@ -263,7 +270,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_11_kp" class="col-xs-4 control-label">Kp:</label>
+                <label for="pid_11_kp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for proportional part" style="text-decoration:none; color: #333333">Kp:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_kp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_11_kp">
@@ -275,7 +282,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_11_ki" class="col-xs-4 control-label">Ki:</label>
+                <label for="pid_11_ki" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for integral part" style="text-decoration:none; color: #333333">Ki:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_ki">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_11_ki">
@@ -287,7 +294,19 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_11_kd" class="col-xs-4 control-label">Kd:</label>
+                <label for="pid_11_damping" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for exponential decay of integrative output. 1000 is no decay" style="text-decoration:none; color: #333333">Damping:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="1000" id="pid_11_damping">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_11_damping">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_11_damping_units">&permil; &commat; 1.9kHz</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_11_kd" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for derivative part" style="text-decoration:none; color: #333333">Kd:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_11_kd">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_11_kd">
@@ -300,7 +319,7 @@
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="checkbox" style="padding-bottom: 12px;">
                 <label class="group-label">
-                  <input type="checkbox" id="pid_12_enable" checked> PID 2 -> 1
+                  <input type="checkbox" id="pid_12_enable" checked><a data-toggle="tooltip" title="This PID uses CH2/CHB as input and is wired to ouput CH1/CHA" style="text-decoration:none; color: #333333"> 2 -> 1</a>
                 </label>
               </div>
             </form>
@@ -313,7 +332,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_12_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <label for="pid_12_sp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Input (error) value the pid tries to hold" style="text-decoration:none; color: #333333">Setpoint:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_sp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_12_sp">
@@ -325,7 +344,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_12_kp" class="col-xs-4 control-label">Kp:</label>
+                <label for="pid_12_kp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for proportional part" style="text-decoration:none; color: #333333">Kp:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_kp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_12_kp">
@@ -337,7 +356,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_12_ki" class="col-xs-4 control-label">Ki:</label>
+                <label for="pid_12_ki" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for integral part" style="text-decoration:none; color: #333333">Ki:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_ki">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_12_ki">
@@ -349,7 +368,19 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_12_kd" class="col-xs-4 control-label">Kd:</label>
+                <label for="pid_12_damping" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for exponential decay of integrative output. 1000 is no decay" style="text-decoration:none; color: #333333">Damping:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="1000" id="pid_12_damping">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_12_damping">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_12_damping_units">&permil; &commat; 1.9kHz</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_12_kd" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for derivative part" style="text-decoration:none; color: #333333">Kd:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_12_kd">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_12_kd">
@@ -362,7 +393,7 @@
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="checkbox" style="padding-bottom: 12px;">
                 <label class="group-label">
-                  <input type="checkbox" id="pid_21_enable" checked> PID 1 -> 2
+                  <input type="checkbox" id="pid_21_enable" checked><a data-toggle="tooltip" title="This PID uses CH1/CHA as input and is wired to ouput CH2/CHB" style="text-decoration:none; color: #333333"> PID 1 -> 2</a>
                 </label>
               </div>
             </form>
@@ -375,7 +406,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_21_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <label for="pid_21_sp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Input (error) value the pid tries to hold" style="text-decoration:none; color: #333333">Setpoint:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_sp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_21_sp">
@@ -387,7 +418,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_21_kp" class="col-xs-4 control-label">Kp:</label>
+                <label for="pid_21_kp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for proportional part" style="text-decoration:none; color: #333333">Kp:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_kp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_21_kp">
@@ -399,7 +430,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_21_ki" class="col-xs-4 control-label">Ki:</label>
+                <label for="pid_21_ki" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for integral part" style="text-decoration:none; color: #333333">Ki:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_ki">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_21_ki">
@@ -411,7 +442,19 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_21_kd" class="col-xs-4 control-label">Kd:</label>
+                <label for="pid_21_damping" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for exponential decay of integrative output. 1000 is no decay" style="text-decoration:none; color: #333333">Damping:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="1000" id="pid_21_damping">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_21_damping">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_21_damping_units">&permil; &commat; 1.9kHz</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_21_kd" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for derivative part" style="text-decoration:none; color: #333333">Kd:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_21_kd">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_21_kd">
@@ -424,7 +467,7 @@
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="checkbox" style="padding-bottom: 12px;">
                 <label class="group-label">
-                  <input type="checkbox" id="pid_22_enable" checked> PID 2 -> 2
+                  <input type="checkbox" id="pid_22_enable" checked><a data-toggle="tooltip" title="This PID uses CH2/CHB and is wired to ouput CH2/CHB" style="text-decoration:none; color: #333333"> PID 2 -> 2</a>
                 </label>
               </div>
             </form>
@@ -437,7 +480,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_22_sp" class="col-xs-4 control-label">Setpoint:</label>
+                <label for="pid_22_sp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Input (error) value the pid tries to hold" style="text-decoration:none; color: #333333">Setpoint:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_sp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_22_sp">
@@ -449,7 +492,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_22_kp" class="col-xs-4 control-label">Kp:</label>
+                <label for="pid_22_kp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for proportional part" style="text-decoration:none; color: #333333">Kp:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_kp">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_22_kp">
@@ -461,7 +504,7 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_22_ki" class="col-xs-4 control-label">Ki:</label>
+                <label for="pid_22_ki" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for integral part" style="text-decoration:none; color: #333333">Ki:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_ki">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_22_ki">
@@ -473,7 +516,19 @@
             </form>
             <form class="form-horizontal" role="form" onsubmit="return false;">
               <div class="form-group">
-                <label for="pid_22_kd" class="col-xs-4 control-label">Kd:</label>
+                <label for="pid_22_damping" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for exponential decay of integrative output. 1000 is no decay" style="text-decoration:none; color: #333333">Damping:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="1000" id="pid_22_damping">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_22_damping">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_damping_units">&permil; &commat; 1.9kHz</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_22_kd" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for derivative part" style="text-decoration:none; color: #333333">Kd:</a></label>
                 <div class="col-xs-4 col-sm-5">
                   <input type="text" autocomplete="off" class="form-control" value="0" id="pid_22_kd">
                   <span style="display: none;" class="input-group-btn" id="apply_pid_22_kd">
@@ -481,6 +536,80 @@
                   </span>
                 </div>
                 <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_22_kd_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_121_enable" checked><a data-toggle="tooltip" title="This PID uses output from PID 1 -> 2 as input and is wired to ouput CH1" style="text-decoration:none; color: #333333"> PID 1 -> 2 -> 1</a>
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="checkbox" style="padding-bottom: 12px;">
+                <label class="group-label">
+                  <input type="checkbox" id="pid_121_rst" checked> Integrator reset
+                </label>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_121_sp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Input (error) value the pid tries to hold" style="text-decoration:none; color: #333333">Setpoint:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_121_sp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_121_sp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_121_sp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_121_kp" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for proportional part" style="text-decoration:none; color: #333333">Kp:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_121_kp">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_121_kp">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_121_kp_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_121_ki" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for integral part" style="text-decoration:none; color: #333333">Ki:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_121_ki">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_121_ki">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_121_ki_units">cnt</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_121_damping" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for exponential decay of integrative output. 1000 is no decay" style="text-decoration:none; color: #333333">Damping:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="1000" id="pid_121_damping">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_121_damping">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_121_damping_units">&permil; &commat; 1.9kHz</div>
+              </div>
+            </form>
+            <form class="form-horizontal" role="form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="pid_121_kd" class="col-xs-4 control-label"><a data-toggle="tooltip" title="Factor for derivative part" style="text-decoration:none; color: #333333">Kd:</a></label>
+                <div class="col-xs-4 col-sm-5">
+                  <input type="text" autocomplete="off" class="form-control" value="0" id="pid_121_kd">
+                  <span style="display: none;" class="input-group-btn" id="apply_pid_121_kd">
+                    <button type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-circle"></span></button>
+                  </span>
+                </div>
+                <div style="padding: 7px 0 0;" class="col-xs-2" id="pid_121_kd_units">cnt</div>
               </div>
             </form>
           </div>
@@ -499,22 +628,30 @@
 	            <form class="form-horizontal" role="form" onsubmit="return false;">
 	              <div class="row" style="margin-bottom:10px;">
 			    	<div class="col-xs-8 col-md-12 col-lg-8 col-sm-offset-4 col-md-offset-0 col-lg-offset-4 settings_btns">
+	                 <a data-toggle="tooltip" title="Import settings from your local machine" style="text-decoration:none; color: #333333">
 	                 <button id="settings_import" class="btn btn-primary btn_settings" onclick="return showSettingsImportForm()">
 	                    <span class="glyphicon glyphicon-upload"></span> Import
 	                  </button>
+	                  </a>
+	                  <a data-toggle="tooltip" title="Save settings on your local machine" style="text-decoration:none; color: #333333">
 	                  <button id="settings_export" class="btn btn-primary btn_settings" onclick="return exportSettings()">
 	                    <span class="glyphicon glyphicon-upload"></span> Export
 	                  </button> 
+	                  </a>
 	                </div>
 	              </div>
 	              <div class="row">
 			    	<div class="col-xs-8 col-md-12 col-lg-8 col-sm-offset-4 col-md-offset-0 col-lg-offset-4 settings_btns">
+	                  <a data-toggle="tooltip" title="Load latest settings from RedPitaya. To switch to an older settings version one has to edit '/var/opt/stabilizer/settings_meta'" style="text-decoration:none; color: #333333">
 	                  <button id="settings_upload" class="btn btn-primary btn_settings" onclick="return loadSettings()">
 	                    <span class="glyphicon glyphicon-upload"></span> Load
 	                  </button>
+	                  </a>
+	                  <a data-toggle="tooltip" title="Store current settings on RedPitay (in directory '/var/opt/stabilizer'). The file will be archived with current date" style="text-decoration:none; color: #333333">
 	                  <button id="settings_save" class="btn btn-primary btn_settings" onclick="return saveSettings()">
 	                    <span class="glyphicon glyphicon-upload"></span> Save
 	                  </button> 
+	                  </a>
 	                </div>
 	              </div>
 	            </form>

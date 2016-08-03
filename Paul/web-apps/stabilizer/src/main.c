@@ -102,6 +102,8 @@ static rp_app_params_t rp_main_params[PARAMS_NUM+1] = {
 	        "pid_11_kp",  0, 1, 0, -8192, 8191 },
 	    { /* pid_NN_ki - PID NN integral gain     Ki in [ADC] counts. */
 	        "pid_11_ki",  0, 1, 0, -8192, 8191 },
+	    { /* pid_NN_damping - PID NN damping factor in permil. */
+	    	 "pid_11_damping",  1000, 1, 0, 0, 1000 },
 	    { /* pid_NN_kd - PID NN derivative gain   Kd in [ADC] counts. */
 	        "pid_11_kd",  0, 1, 0, -8192, 8191 },
 
@@ -119,6 +121,8 @@ static rp_app_params_t rp_main_params[PARAMS_NUM+1] = {
 	        "pid_12_kp",  0, 1, 0, -8192, 8191 },
 	    { /* pid_NN_ki - PID NN integral gain     Ki in [ADC] counts. */
 	        "pid_12_ki",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_damping - PID NN damping factor in permil. */
+			"pid_12_damping",  1000, 1, 0, 0, 1000 },
 	    { /* pid_NN_kd - PID NN derivative gain   Kd in [ADC] counts. */
 	        "pid_12_kd",  0, 1, 0, -8192, 8191 },
 
@@ -136,6 +140,8 @@ static rp_app_params_t rp_main_params[PARAMS_NUM+1] = {
 	        "pid_21_kp",  0, 1, 0, -8192, 8191 },
 	    { /* pid_NN_ki - PID NN integral gain     Ki in [ADC] counts. */
 	        "pid_21_ki",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_damping - PID NN damping factor in permil. */
+			"pid_21_damping",  1000, 1, 0, 0, 1000 },
 	    { /* pid_NN_kd - PID NN derivative gain   Kd in [ADC] counts. */
 	        "pid_21_kd",  0, 1, 0, -8192, 8191 },
 
@@ -153,8 +159,30 @@ static rp_app_params_t rp_main_params[PARAMS_NUM+1] = {
 	        "pid_22_kp",  0, 1, 0, -8192, 8191 },
 	    { /* pid_NN_ki - PID NN integral gain     Ki in [ADC] counts. */
 	        "pid_22_ki",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_damping - PID NN damping factor in permil. */
+			"pid_22_damping",  1000, 1, 0, 0, 1000 },
 	    { /* pid_NN_kd - PID NN derivative gain   Kd in [ADC] counts. */
 	        "pid_22_kd",  0, 1, 0, -8192, 8191 },
+
+		//pid_121 uses output from pid_21 as input and is routed to Out1
+		{ /* pid_NN_enable - Enables/closes or disables/open PID NN loop:
+		   *    0 - PID disabled (open loop)
+		   *    1 - PID enabled (closed loop)    */
+		    "pid_121_enable", 0, 1, 0, 0, 1 },
+		{ /* pid_NN_rst - Reset PID NN integrator:
+		   *    0 - Do not reset integrator
+		   *    1 - Reset integrator            */
+		    "pid_121_rst", 0, 1, 0, 0, 1 },
+		{ /* pid_NN_sp - PID NN set-point in [ADC] counts. */
+		    "pid_121_sp",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_kp - PID NN proportional gain Kp in [ADC] counts. */
+		    "pid_121_kp",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_ki - PID NN integral gain     Ki in [ADC] counts. */
+		    "pid_121_ki",  0, 1, 0, -8192, 8191 },
+		{ /* pid_NN_damping - PID NN damping factor in permil. */
+			"pid_121_damping",  1000, 1, 0, 0, 1000 },
+		{ /* pid_NN_kd - PID NN derivative gain   Kd in [ADC] counts. */
+		    "pid_121_kd",  0, 1, 0, -8192, 8191 },
 
 		/******************************************/
 		/* Command parameters from here on */
@@ -163,6 +191,10 @@ static rp_app_params_t rp_main_params[PARAMS_NUM+1] = {
 			"cmd_cnt", 0, 0, 0, 0, 1000 },
 		{ /* cmd encoded command */
 			"cmd", 0, 0, 0, 0, 100 },
+
+
+		{ /* gui comment by user - the value represents the parameter's index and it's either 53 or -53 (comments have been changed) */
+			"Make a note", 53, 1, 0, -100, 100   },
 
     { /* Must be last! */
         NULL, 0.0, -1, -1, 0.0, 0.0 }
@@ -184,8 +216,8 @@ int rp_app_init(void)
 
 	struct stat st = {0};
 
-	if (stat(SETTINGS_DIR, &st) == -1) {
-	    if(mkdir(SETTINGS_DIR, 0700)==-1)						//create directory for settings file if not existing
+	if (stat(FILES_DIR, &st) == -1) {
+	    if(mkdir(FILES_DIR, 0700)==-1)						//create directory for settings file if not existing
 	    	return -1;											//may fail on an other RedPitaya (other OS version, manipulated file structure,..)
 	}
 
@@ -209,7 +241,27 @@ int rp_app_init(void)
 		release();
 		return -1;
 	}
-    rp_set_params(&rp_main_params[0], PARAMS_NUM); 						//initialize with default params
+
+	char *cmt = (char*)malloc(MAX_COMMENT_SIZE+1);
+	if(cmt!=NULL){
+		FILE *f = fopen(COMMENT_FILE, "r");
+		if(f!=NULL)
+			rp_main_params[CMT].name = fgets(cmt, MAX_COMMENT_SIZE+1,f);
+		else{
+			int i=0;
+			while(rp_main_params[CMT].name[i]!='\0'){
+				cmt[i] = rp_main_params[CMT].name[i];
+				++i;
+			}
+			cmt[i] = '\0';
+		}
+		rp_main_params[CMT].name = cmt;
+		cmt[MAX_COMMENT_SIZE] = '\0';
+	}
+	else
+		return -1;
+
+	rp_set_params(&rp_main_params[0], PARAMS_NUM); 						//initialize with default params
     return 0;
 }
 
@@ -333,6 +385,10 @@ int rp_set_params(rp_app_params_t *p, int len)
         }
 
         if(p_idx == -1) {
+        	if(p[i].value == -CMT){
+        		update_comment(p[i].name);
+        		continue;
+        	}
             fprintf(stderr, "Parameter %s not found, ignoring it\n", p[i].name);
             continue;
         }
@@ -345,11 +401,13 @@ int rp_set_params(rp_app_params_t *p, int len)
                 params_change = 1;
             if(p_idx >= PARAMS_PID_PARAMS && p_idx<PARAMS_CMD_PARAMS)
                 pid_params_change = 1;
-            if(p_idx==OP_MODE_PARAM || p_idx==TARGET_CHANNEL){
+            if(p_idx==OP_MODE_PARAM){
             	if(p[i].value==1)															//lock mode
             		mode_change = 1;														//delay pid update
             	pid_params_change = params_change = 1;
             }
+            if(p_idx==PID_11_DAMPING || p_idx==PID_12_DAMPING || p_idx==PID_21_DAMPING || p_idx==PID_22_DAMPING || p_idx==PID_121_DAMPING)
+            	p[i].value = ceil(p[i].value);
             if(p_idx==LOCK_OFF)
             	params_change = 1;
             if(p_idx==CMD_CNT){
@@ -410,7 +468,7 @@ int rp_set_params(rp_app_params_t *p, int len)
     	   usleep(PID_DELAY);				//pids have to wait until lock_offset dc output is active
     	   mode_change = 0;
     	}
-        if(pid_update(&rp_main_params[0], rp_main_params[TARGET_CHANNEL].value) < 0) {
+        if(pid_update(&rp_main_params[0]) < 0) {
         	pthread_mutex_unlock(&rp_main_params_mutex);
             return -1;
         }
@@ -422,6 +480,23 @@ int rp_set_params(rp_app_params_t *p, int len)
     pthread_mutex_unlock(&rp_main_params_mutex);
 
     return 0;
+}
+
+/* overwrite old comments */
+void update_comment(char* cmt){
+	FILE *f = fopen(COMMENT_FILE, "w");
+	if(f==NULL)
+		return;
+	fprintf(f, "%s", cmt);
+	fclose(f);
+
+	char* tmp = rp_main_params[CMT].name;
+	int i=0;
+	while(cmt[i]!='\0' && i<MAX_COMMENT_SIZE+1){
+		tmp[i] = cmt[i];
+		++i;
+	}
+	tmp[MIN(i,MAX_COMMENT_SIZE)] = '\0';
 }
 
 void execute_cmd(int cmd){

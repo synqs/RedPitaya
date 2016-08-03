@@ -26,25 +26,25 @@
  * A direct translation from GUI PID parameters to the FPGA registers.
  *
  * The PID Controller algorithm itself is implemented in FPGA.
- * There are 4 independent PID controllers, connecting each input (IN1, IN2)
- * to each output (OUT1, OUT2):
- *
- *                 /-------\       /-----------\
- *   IN1 -----+--> | PID11 | ------| SUM & SAT | ---> OUT1
- *            |    \-------/       \-----------/
- *            |                            ^
- *            |    /-------\               |
- *            ---> | PID21 | ----------    |
- *                 \-------/           |   |
- *                                     |   |
- *                                     |   |
+ * There are 4 independent PID controllers, connecting each input (IN1, IN2)[CHA, CHB]
+ * to each output (OUT1, OUT2)[CHA, CHB]:
+*
+ *                 /-------\           /-----------\
+ *   CHA -----+--> | PID11 | ----------| SUM & SAT | ---> CHA
+ *            |    \-------/           \-----------/
+ *            |                            ^     ^
+ *            |    /-------\               |     |
+ *            ---> | PID21 | ----------    |  /--------\
+ *                 \-------/           +----->| PID121 |
+ *                                     |   |  \--------/
+ *  INPUT                              |   |             OUTPUT
  *                                     |   |
  *                 /-------\           |   |
- *            ---> | PID12 | --------------
+ *            ---> | PID12 | --------------+
  *            |    \-------/           |
  *            |                        ˇ
  *            |    /-------\       /-----------\
- *   IN2 -----+--> | PID22 | ------| SUM & SAT | ---> OUT2
+ *   CHB -----+--> | PID22 | ------| SUM & SAT | ---> CHB
  *                 \-------/       \-----------/
  *
  */
@@ -104,7 +104,7 @@ int pid_exit(void)
  * @retval -1 failure, error message is repoted on standard error device
  * @retval  0 succesful update
  */
-int pid_update(rp_app_params_t *params, int target_channel)
+int pid_update(rp_app_params_t *params)
 {
     int i;
 
@@ -113,15 +113,18 @@ int pid_update(rp_app_params_t *params, int target_channel)
 
     for (i = 0; i < NUM_OF_PIDS; ++i) {
         /* PID enabled? */
+    	pid[i].damping = 1024;
         if (params[PID_11_ENABLE + i * PARAMS_PER_PID].value == 1) {
             pid[i].kp = (int)params[PID_11_KP + i * PARAMS_PER_PID].value;
             pid[i].ki = (int)params[PID_11_KI + i * PARAMS_PER_PID].value;
+            pid[i].damping = roundf((params[PID_11_DAMPING + i * PARAMS_PER_PID].value/1000.0)*1024.0);   //rescale, since it's much easier for the fpga to divide by 1024 (powers of 2)
             pid[i].kd = (int)params[PID_11_KD + i * PARAMS_PER_PID].value;
         }
 
         g_pid_reg->pid[i].setpoint = (int)params[PID_11_SP + i * PARAMS_PER_PID].value;
         g_pid_reg->pid[i].kp = pid[i].kp;
         g_pid_reg->pid[i].ki = pid[i].ki;
+        g_pid_reg->pid[i].damping = pid[i].damping;
         g_pid_reg->pid[i].kd = pid[i].kd;
 
         if (params[PID_11_RESET + i * PARAMS_PER_PID].value == 1) {
@@ -145,6 +148,7 @@ int pid_disable(){
 	    g_pid_reg->pid[i].setpoint = 0;
 	    g_pid_reg->pid[i].kp = 0;
 	    g_pid_reg->pid[i].ki = 0;
+	    g_pid_reg->pid[i].damping = 1024;
 	    g_pid_reg->pid[i].kd = 0;
 	    ireset |= (1 << i);
 	}

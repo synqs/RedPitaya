@@ -82,6 +82,7 @@ void reset_pids(void)
             g_pid_reg->pid[i].setpoint = 0;
             g_pid_reg->pid[i].kp = 0;
             g_pid_reg->pid[i].ki = 0;
+            g_pid_reg->pid[i].damping = 1024;
             g_pid_reg->pid[i].kd = 0;
         }
 

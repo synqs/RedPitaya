@@ -25,7 +25,7 @@
 #define PID_BASE_SIZE 0x100
 
 /** Number of PID controllers */
-#define NUM_OF_PIDS 4
+#define NUM_OF_PIDS 5
 
 
 /** PID Controller parameters */
@@ -48,6 +48,11 @@ typedef struct {
      *  bit  [13: 0] - Integral gain (signed)
      */
     uint32_t ki;
+    /** @brief Relative offset 0x8 - Integral damping factor
+     *
+     *  bits [31:14] - Reserved
+     *  bit  [13: 0] - Integral damping factor (unsigned)*/
+    uint32_t damping;
     /** @brief Relative offset 0xC - Derivative gain
      *
      *  bits [31:14] - Reserved

@@ -36,6 +36,8 @@ var range_steps = [0.5, 1, 2, 5, 10, 20, 50, 100];
 
 var isScanMode = true;
 
+var CMT = 53; //index of comment parameter
+
 var plot_options = {
   colors: ['#3276B1', '#D2322D', '#009900'],    // channel1, channel2, LockOff line
   lines: { lineWidth: 1 },
@@ -128,6 +130,10 @@ $(function() {
   
   $('input,select', '#accordion').on('focus', function() {
     user_editing = true;
+  });
+  
+  $('#comment').on('focus', function() {
+	user_editing = true;
   });
   
   $('#op_mode').on('change', function() { 
@@ -389,12 +395,12 @@ $(function() {
 
 //Events binding for PID Controller
  
- $('#pid_11_enable, #pid_12_enable, #pid_21_enable, #pid_22_enable').on('change', function() { 
+ $('#pid_11_enable, #pid_12_enable, #pid_21_enable, #pid_22_enable, #pid_121_enable').on('change', function() { 
    params.local[this.id] = ($(this).is(':checked') ? 1 : 0);
    sendParams(); 
  });
 
- $('#pid_11_rst, #pid_12_rst, #pid_21_rst, #pid_22_rst').on('change', function() { 
+ $('#pid_11_rst, #pid_12_rst, #pid_21_rst, #pid_22_rst, #pid_121_rst').on('change', function() { 
    params.local[this.id] = ($(this).is(':checked') ? 1 : 0);
    sendParams(); 
  });
@@ -483,6 +489,35 @@ $(function() {
        $(this).blur();
      }
    });
+
+ $('#pid_11_damping')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_11_damping').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_11_damping').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_11_damping = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_11_damping)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
 
  $('#pid_11_kd')
    .on('focus paste', function() {
@@ -597,6 +632,34 @@ $(function() {
      }
    });
 
+ $('#pid_12_damping')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_12_damping').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_12_damping').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_12_damping = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_12_damping)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
  $('#pid_12_kd')
    .on('focus paste', function() {
      $(this).parent().addClass('input-group');
@@ -710,6 +773,34 @@ $(function() {
      }
    });
 
+ $('#pid_21_damping')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_21_damping').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_21_damping').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_21_damping = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_21_damping)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
  $('#pid_21_kd')
    .on('focus paste', function() {
      $(this).parent().addClass('input-group');
@@ -823,6 +914,34 @@ $(function() {
      }
    });
 
+ $('#pid_22_damping')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_22_damping').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_22_damping').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_22_damping = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_22_damping)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
  $('#pid_22_kd')
    .on('focus paste', function() {
      $(this).parent().addClass('input-group');
@@ -850,7 +969,165 @@ $(function() {
        $(this).blur();
      }
    });
+ 
 
+ // PID 121 Setpoint, Kp, Ki, Kd
+ $('#pid_121_sp')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_121_sp').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_121_sp').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_121_sp = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_121_sp)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+
+ $('#pid_121_kp')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_121_kp').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_121_kp').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_121_kp = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_121_kp)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+
+ $('#pid_121_ki')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_121_ki').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_121_ki').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_121_ki = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_121_ki)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+
+ $('#pid_121_damping')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_121_damping').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_121_damping').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_121_damping = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_121_damping)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
+ $('#pid_121_kd')
+   .on('focus paste', function() {
+     $(this).parent().addClass('input-group');
+     $('#apply_pid_121_kd').show();
+   })
+   .on('blur', function() {
+     $('#apply_pid_121_kd').hide();
+     $(this).parent().removeClass('input-group');
+     
+     var val = parseLocalFloat($(this).val());
+     if(! isNaN(val)) {
+       params.local.pid_121_kd = val;
+       sendParams();
+     }
+     else {
+       $(this).val(params.local.pid_121_kd)
+     }
+     user_editing = false;
+   })
+   .on('change', function() {
+     $(this).blur();
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
+ $('#comment')
+   .on('blur', function() {
+	 var keys = Object.keys(params.local);
+     params.local[keys[CMT]] = -CMT;
+     Object.defineProperty(params.local, $(this).val(),
+    	        Object.getOwnPropertyDescriptor(params.local, keys[CMT]));
+     delete params.local[keys[CMT]];
+     sendParams();
+     user_editing = false;
+   })
+   .on('keypress', function(e) {
+     if(e.keyCode == 13) {
+       $(this).blur();
+     }
+   });
+ 
   // Modals
   
   $('#modal_err, #modal_app').modal({ show: false, backdrop: 'static', keyboard: false });
@@ -917,6 +1194,11 @@ $(function() {
     });
   };
           
+});
+
+$(document).ready(function(){
+    //$('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 });
 
 function startApp() {
@@ -1206,28 +1488,43 @@ function loadParams(orig_params) {
   $('#pid_12_enable').prop('checked', (params.original.pid_12_enable ? true : false));
   $('#pid_21_enable').prop('checked', (params.original.pid_21_enable ? true : false));
   $('#pid_22_enable').prop('checked', (params.original.pid_22_enable ? true : false));
+  $('#pid_121_enable').prop('checked', (params.original.pid_121_enable ? true : false));
+
 
   $('#pid_11_rst').prop('checked', (params.original.pid_11_rst ? true : false));
   $('#pid_12_rst').prop('checked', (params.original.pid_12_rst ? true : false));
   $('#pid_21_rst').prop('checked', (params.original.pid_21_rst ? true : false));
   $('#pid_22_rst').prop('checked', (params.original.pid_22_rst ? true : false));
-  
+  $('#pid_121_rst').prop('checked', (params.original.pid_121_rst ? true : false));
+
   $('#pid_11_sp').val(params.original.pid_11_sp);
   $('#pid_11_kp').val(params.original.pid_11_kp);
   $('#pid_11_ki').val(params.original.pid_11_ki);
+  $('#pid_11_damping').val(params.original.pid_11_damping);
   $('#pid_11_kd').val(params.original.pid_11_kd);
   $('#pid_12_sp').val(params.original.pid_12_sp);
   $('#pid_12_kp').val(params.original.pid_12_kp);
   $('#pid_12_ki').val(params.original.pid_12_ki);
+  $('#pid_12_damping').val(params.original.pid_12_damping);
   $('#pid_12_kd').val(params.original.pid_12_kd);
   $('#pid_21_sp').val(params.original.pid_21_sp);
   $('#pid_21_kp').val(params.original.pid_21_kp);
   $('#pid_21_ki').val(params.original.pid_21_ki);
+  $('#pid_21_damping').val(params.original.pid_21_damping);
   $('#pid_21_kd').val(params.original.pid_21_kd);
   $('#pid_22_sp').val(params.original.pid_22_sp);
   $('#pid_22_kp').val(params.original.pid_22_kp);
   $('#pid_22_ki').val(params.original.pid_22_ki);
+  $('#pid_22_damping').val(params.original.pid_22_damping);
   $('#pid_22_kd').val(params.original.pid_22_kd);
+  $('#pid_121_sp').val(params.original.pid_121_sp);
+  $('#pid_121_kp').val(params.original.pid_121_kp);
+  $('#pid_121_ki').val(params.original.pid_121_ki);
+  $('#pid_121_damping').val(params.original.pid_121_damping);
+  $('#pid_121_kd').val(params.original.pid_121_kd);
+  
+  var keys = Object.keys(params.original);
+  $('#comment').val(keys[CMT]);
   
   isScanMode = params.original.op_mode==0;
   
